@@ -6,8 +6,9 @@ os.chdir(os.path.dirname(__file__))# gets around Python's messy working director
 
 # print(os.getcwd())
 
-f = open('file.txt', 'r', encoding='utf-8')
+f = open('file.txt', 'r', encoding='utf-8') # the 'r' attribute is synonymous with "rt"
 
-print(f.readline())
+print("Printing just the 1st line:\n\n" + f.readline())
 
+print("All remaining lines (as a list object): \n")
 print(f.readlines())
