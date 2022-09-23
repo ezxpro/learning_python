@@ -34,3 +34,13 @@ elif '.mrimg' in last_file: # generates and stores digest
     h = open(BKP_PATH + last_file + '.sha1', 'w', encoding = "utf-8")
     h.write(digest + " *" + last_file)
     h.close()
+'''
+Just checked and there's more than one unverified backup.
+I should:
+1. organize this code into functions and;
+2. Make it create a list of all unverified backups at launch
+Something like this should do:
+    for i in file_list:
+        if i + ".sha1" not in file_list:
+            (...) 
+'''
