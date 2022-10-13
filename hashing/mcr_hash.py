@@ -1,7 +1,7 @@
 import hashlib
 import os
 
-BKP_PATH = "Z:\\Setembro\\"
+BKP_PATH = "Z:\\Outubro\\"
 BUF_SIZE = 8388608
 
 file_list = os.listdir(BKP_PATH)
