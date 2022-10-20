@@ -5,6 +5,13 @@ Para maiores detalhes, acesse a [documentação oficial](https://docs.gspread.or
 
 Todas as informações contidas neste README estão presentes nesta documentação.
 
+## Instalando o gspread
+
+Para poder utilizar a biblioteca, você deve instalá-la rodando o comando:
+```
+pip install gspread
+```
+
 ## Autenticação e Autorização com GSpread
 
 O processo de autenticação e/ou autorização com o GSpread é bem simples, e pode ser feito de duas maneiras, via OAuth (autorização) ou via Service Account (autenticação.)
@@ -34,6 +41,92 @@ Para isso:
 ![Ativando APIs](img/3_ativar_apis.png)
 
 ### Para bots e scripts automatizados: usando uma Conta de Serviço
+A conta de serviço é um tipo especial de conta cujo propósito é representar um usuário não humano que precise autenticar e autorizar o acesso à dados nas APIs do Google.
+
+Como esta é uma conta separada, por padrão ela não tem acesso à nenhuma planilhar até que você compartilhe-as com essa conta, como faria com qualquer outra conta Google.
+
+Veja como adquirir uma:
+1. [Ative o acesso da API no projeto](#ativando-as-apis-do-google) as APIs do Google)
+2. Acesse a opção `APIs e Serviços > Credenciais`
+![Menu credenciais](img/auth_sa/1_credenciais.png)`
+3. Clique em `Criar Credenciais > Conta de serviço`
+![Criar Credenciais](img/auth_sa/2_criar_credenciais.png)
+4. Preencha o formulário e clique em concluir. O endereço do campo central será usado para compartilhar planilhas com a conta de serviço
+![criando conta de serviço](img/auth_sa/3_form_cred_cs.png)
+5. Clique em `Gerenciar contas de serviço` acima de Contas de Serviço.
+6. No menu de ações, do lado direito do endereço da conta, clique em "Gerenciar chaves"
+![gerenciar chaves](img/auth_sa/4_gerenciar_chaves.png)
+7. Clique em `Adicionar chave > Criar nova Chave > JSON` e depois clique em `Criar`
+
+Um prompt aparecerá para que você efetue o download das credenciais no formato JSON, com a seguinte estrutura:
+```
+{
+    "type": "service_account",
+    "project_id": "api-project-XXX",
+    "private_key_id": "2cd … ba4",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nNrDyLw … jINQh/9\n-----END PRIVATE KEY-----\n",
+    "client_email": "473000000000-yoursisdifferent@developer.gserviceaccount.com",
+    "client_id": "473 … hd.apps.googleusercontent.com",
+    ...
+}
+```
+Salve o arquivo em algum local seguro, você também precisará do endereço de email indicado no camo `client_email`. 
+
+Para maior facilidade de uso é recomendável que você salve o arquivo com um nome diferente daquele gerado aleatóriamente no momento do download. Neste guia, usaremos o nome `service_account.json`
+
+8. **Muito Importante!** Vá até sua planilha e compartilhe-a com o *client_email* do passo acima. Se você não fizer isso, receberá o erro `gspread.exceptions.SpreadsheetNotFound` quando tentar acessar a planilha no seu código
+   
+9.  Move o arquivo baixado para `~/.config/gspread/service_account.json` (UNIX/Linux). Usuários do Windows devem utilizar `%APPDATA%\gspread\service_account.json` 
+PS: estes são os caminhos nos quais o gspread busca as credenciais por padrão, mas você pode indicar um caminho de sua preferência no código.
+
+10. Crie um arquivo Python com esse código:
+```
+import gspread
+
+gc = gspread.service_account()
+
+sh = gc.open("Example spreadsheet")
+
+print(sh.sheet1.get('A1'))
+```
+
+Como uma curiosidade, esse é o código da função `service_account()`:
+```
+from google.oauth2.service_account import Credentials
+
+scopes = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+]
+
+credentials = Credentials.from_service_account_file(
+    'path/to/the/downloaded/file.json',
+    scopes=scopes
+)
+
+gc = gspread.authorize(credentials)
+```
+
+Também há a possibilidade de passar as credenciais como um dicionário:
+```
+import gspread
+
+credentials = {
+    "type": "service_account",
+    "project_id": "api-project-XXX",
+    "private_key_id": "2cd … ba4",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nNrDyLw … jINQh/9\n-----END PRIVATE KEY-----\n",
+    "client_email": "473000000000-yoursisdifferent@developer.gserviceaccount.com",
+    "client_id": "473 … hd.apps.googleusercontent.com",
+    ...
+}
+
+gc = gspread.service_account_from_dict(credentials)
+
+sh = gc.open("Example spreadsheet")
+
+print(sh.sheet1.get('A1'))
+```
 
 ### Para usuários finais: Usando OAuth Client ID
 
