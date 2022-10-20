@@ -76,7 +76,7 @@ Para maior facilidade de uso é recomendável que você salve o arquivo com um n
 
 8. **Muito Importante!** Vá até sua planilha e compartilhe-a com o *client_email* do passo acima. Se você não fizer isso, receberá o erro `gspread.exceptions.SpreadsheetNotFound` quando tentar acessar a planilha no seu código
    
-9.  Move o arquivo baixado para `~/.config/gspread/service_account.json` (UNIX/Linux). Usuários do Windows devem utilizar `%APPDATA%\gspread\service_account.json` 
+9.  Mova o arquivo baixado para `~/.config/gspread/service_account.json` (UNIX/Linux). Usuários do Windows devem utilizar `%APPDATA%\gspread\service_account.json` 
 PS: estes são os caminhos nos quais o gspread busca as credenciais por padrão, mas você pode indicar um caminho de sua preferência no código.
 
 10. Crie um arquivo Python com esse código:
@@ -130,4 +130,33 @@ print(sh.sheet1.get('A1'))
 
 ### Para usuários finais: Usando OAuth Client ID
 
+1. [Ative o acesso da API no projeto](#ativando-as-apis-do-google) as APIs do Google)
+2. No lado esquerdo da tela, clique no menu e em seguida em `Tela de permissão OAuth`
+3. Preencha o formulário OAuth
+    1. **Tipo do app:**  leia a descrição do tipo de usuário do aplicativo (Interno ou Externo) e escolha uma das opções. Contas internas só estão disponíveis para usuários com assinatura/versão de testes do Google Workspace. Por padrão, este guia usa a opção de usuário **Externo**:
+    ![selecionar tipo de usuário](img/oauth/1_user_type.png)
+    2. **Descrição do App:** dê um nome para seu aplicativo, informe um email para suporte e um email para contato. Opcionalmente, nesta tela você pode adicionar um logotipo para o app e restringir o acesso ao app apenas para apenas alguns domínios. Por padrão, deixaremos todas estas opções em branco:
+    ![informações do aplicativo](img/oauth/2_app_info.png)
+    
+    Estas informações serão visualizadas pelo usuário quando o script for rodado e o navegador for aberto para que o usuário autorize o acesso aos dados da conta google. Exemplo:
+    ![exemplo tela oauth](img/oauth/3_oauth_app_example.png)
+    3. **Escopos:** Não é necessário preencher esta tela, clique em "salvar e continuar"
+    4. **Usuários de teste:** aqui você deve adicionar o endereço de email dos usuários finais que terão permissão acesso à aplicação durante a fase de teste. Normalmente, este será o seu proprio email. Após preencher esta tela, clique "Salvar e Continuar"
+4. Acesse `APIs e Serviços > Credenciais`
+5. Clique em `Criar credenciais > ID do cliente OAuth`
+![autorização OAuth](img/oauth/4_oauth_creds.png)
+6. Selecione a opção `App para computador` e digite um nome para o aplicativo. e clique em "Criar".
+ É importante selecionar a opção correta, outros tipos de aplicativos requerem processos diferentes para autorização
+![tipo de cliente](img/oauth/5_type_of_client.png)
+7. Faça o download do arquivo JSON. Reomenda-se salvá-lo em `~/.config/gspread/service_account.json` (UNIX/Linux). Usuários do Windows devem utilizar `%APPDATA%\gspread\service_account.json`, pois por padrão o gspread procura as credenciais nestes caminhos.
+8. Crie um arquivo Python com este código
+```
+import gspread
 
+gc = gspread.oauth()
+
+sh = gc.open("Example spreadsheet")
+
+print(sh.sheet1.get('A1'))
+```
+Uma vez que você rodar o código, uma janela do navegador será aberta
