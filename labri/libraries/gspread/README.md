@@ -16,8 +16,8 @@ pip install gspread
 
 O processo de autenticação e/ou autorização com o GSpread é bem simples, e pode ser feito de duas maneiras, via OAuth (autorização) ou via Service Account (autenticação.)
 
-- Se você pretende acessar as planilhas em nome de um bot, utilize uma Conta de Serviço 
-- Se você pretende acessar planilhas em nome de usuários (incluindo sua própria conta), utilize a autorização via OAuth
+- Se você pretende acessar as planilhas em nome de um bot, [utilize uma Conta de Serviço](#para-bots-e-scripts-automatizados-usando-uma-conta-de-serviço) 
+- Se você pretende acessar planilhas em nome de usuários (incluindo sua própria conta), [utilize a autorização via OAuth](#para-usuários-finais-usando-oauth-client-id)
 
 No caso do GSpread, a diferença entre os dois processos é que autorização (OAuth) acessa a planilha em nome do usuário utilizando a aplicação, e portanto este deverá autorizar o acesso da aplicação – através de uma janela que será aberta no navegador – aos arquivos armazenados na conta Google do usuário.
 
@@ -159,4 +159,37 @@ sh = gc.open("Example spreadsheet")
 
 print(sh.sheet1.get('A1'))
 ```
-Uma vez que você rodar o código, uma janela do navegador será aberta
+Quando você rodar código, uma janela do navegador será aberta pedindo autorização para acessar as planilhas. Este processo só é feito no primeiro acesso, pois as credenciais autorizadas são armazenadas em um arquivo `token.json` no diretório de configuração, juntamente com o arquivo `credentials.json`. 
+
+É possível modificar o caminho de um ou ambos os arquivos acima, veja:
+```
+gc = gspread.oauth(
+    credentials_filename='path/to/the/credentials.json',
+    authorized_user_filename='path/to/the/authorized_user.json'
+)
+```
+
+ 
+Você também pode passar as credenciais diretamente como um dicionário python. Desta maneira, você não precisa armazená-las como arquivos:
+
+
+```
+import gspread
+
+credentials = {
+    {
+        "installed": {
+            "client_id": "12345678901234567890abcdefghijklmn.apps.googleusercontent.com",
+            "project_id": "my-project1234",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            ...
+        }
+    }
+}
+gc, authorized_user = gspread.oauth_from_dict(credentials)
+
+sh = gc.open("Example spreadsheet")
+
+print(sh.sheet1.get('A1'))
+```
