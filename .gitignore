@@ -127,6 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# other
+__pycache__/
+# gspread credentials
 credentials*.json
 credentials.json
 token.json
